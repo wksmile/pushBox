@@ -1,10 +1,14 @@
 import getPlayLevelData from '../playLevelData/level'
 import {loadImg} from '../utils/index'
+import dataBus from '../dataBus'
 
 const screenWidth  = window.innerWidth
 const screenHeight = window.innerHeight
 
 var boxWeight = screenWidth/6
+
+// 全局共享元素块的宽度
+dataBus.boxWeight = boxWeight
 
 // 人物图片
 let personImgPromise = loadImg('images/people.png'),
@@ -24,7 +28,7 @@ let personImg,boxImg,wallImg,dfImg;
 let downImg,leftImg,rightImg,upImg;
 
 export default class BackDraw {
-  constructor(ctx,ctx2,ctx2Canvas) {
+  constructor(ctx) {
     this.ctx = ctx;          //  上屏
     this.person = null;
     this.boxWeight = boxWeight
@@ -94,7 +98,7 @@ export default class BackDraw {
         let imgY = boxWeight * j;
         if(levelData[i][j] === 3 && !isFirstDraw) continue;   // 移动的人物没有画
         if(box && box.i == i && box.j ==j) continue;          // 移动的箱子不绘制
-        if(levelData[i][j] === 3 && !this.person) this.person = {x:i,y:j}   //  返回人物的位置信息
+        if(levelData[i][j] === 3 && !this.person) this.person = {x:i,y:j}  //  返回人物的位置信息
         // console.log('levelData-----',levelData[i][j],imgStartX,imgStartY)
         // let source = this.loadImgByType(levelData[i][j])
         // 图片类型  原文件url  图片开始的横坐标   图片开始的纵坐标
