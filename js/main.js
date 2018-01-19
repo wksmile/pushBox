@@ -16,11 +16,13 @@ export default class Main {
   }
 
   reset() {
+    // 最开始时画的游戏页面
     this.bg.drawBackground('#eee')
     this.bg.drawButtonBefore()
+    // 默认第二个参数为true，表示第一次绘制
     this.bg.drawGame("1")
   }
-
+  // 每次触摸执行
   touchEventHandler(e) {
     e.preventDefault()
     let x = e.touches[0].clientX   // 触摸点x
@@ -29,7 +31,7 @@ export default class Main {
     // console.log(actionButton)
     if (actionButtonType) {
       // 处理响应的运动
-      this.person.handleTouch(actionButtonType,this.bg.person.x,this.bg.person.y)
+      this.person.handleTouch(actionButtonType)
       // 根据方向确定运动的轨迹
       // this.sureMovDirect(actionButtonType)
     }

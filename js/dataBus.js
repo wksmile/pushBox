@@ -1,5 +1,5 @@
 // 全局状态管理
-let busData = {
+const busData = {
   personPosition:{
     x: null,
     y: null
@@ -7,5 +7,12 @@ let busData = {
   // 元素每一块的宽度
   boxWeight: 0
 }
+// 改变数据
+export function changeData(key, value) {
+  busData[key] = value
+}
 
-export default busData
+// 获取数据
+export function getDataBykey(key) {
+  return busData[key]
+}

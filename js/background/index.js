@@ -1,6 +1,7 @@
-import getPlayLevelData from '../playLevelData/level'
+import {getPlayLevelData} from '../playLevelData/level'
 import {loadImg} from '../utils/index'
-import dataBus from '../dataBus'
+// 改变数据
+import {changeData,getDataBykey} from '../dataBus'
 
 const screenWidth  = window.innerWidth
 const screenHeight = window.innerHeight
@@ -8,7 +9,7 @@ const screenHeight = window.innerHeight
 var boxWeight = screenWidth/6
 
 // 全局共享元素块的宽度
-dataBus.boxWeight = boxWeight
+changeData('boxWeight',boxWeight)
 
 // 人物图片
 let personImgPromise = loadImg('images/people.png'),
@@ -18,7 +19,7 @@ boxImgPromise = loadImg('images/box.png'),
 wallImgPromise = loadImg('images/wall.png'),
 // 点
 dfImgPromise = loadImg('images/df.png'),
-  // 方向按钮
+  // 方向按钮图片
 downImgPromise = loadImg('images/cc-arrow-circle-down.png'),
 leftImgPromise = loadImg('images/cc-arrow-circle-left.png'),
 rightImgPromise = loadImg('images/cc-arrow-circle-right.png'),
@@ -30,7 +31,7 @@ let downImg,leftImg,rightImg,upImg;
 export default class BackDraw {
   constructor(ctx) {
     this.ctx = ctx;          //  上屏
-    this.person = null;
+    // this.person = null;
     this.boxWeight = boxWeight
   }
   // 绘制背景颜色，背景大小
@@ -89,16 +90,18 @@ export default class BackDraw {
   }
 
   // 根据关卡地图绘制游戏关卡  isFirstDraw是否是第一次加载
-  drawGameLevel(level,isFirstDraw=true,box){
+  drawGameLevel(level,isFirstDraw=true){
     let levelData = getPlayLevelData(level)
     // console.log(levelData)
     for (let i=0;i<levelData.length;i++){
       for(let j=0;j<levelData[0].length;j++){
         let imgX = boxWeight * i;
         let imgY = boxWeight * j;
-        if(levelData[i][j] === 3 && !isFirstDraw) continue;   // 移动的人物没有画
-        if(box && box.i == i && box.j ==j) continue;          // 移动的箱子不绘制
-        if(levelData[i][j] === 3 && !this.person) this.person = {x:i,y:j}  //  返回人物的位置信息
+        // 只有第一次才会绘制人物，true表示是第一次
+        if(levelData[i][j] === 3 && !isFirstDraw) continue;
+        //  第一次运行才会去得到人物的位置，就是只会执行一次
+        if(levelData[i][j] === 3)  changeData('personPosition',{x:j,y:i})
+        // if(box && box.i == i && box.j ==j) continue;          // 移动的箱子不绘制
         // console.log('levelData-----',levelData[i][j],imgStartX,imgStartY)
         // let source = this.loadImgByType(levelData[i][j])
         // 图片类型  原文件url  图片开始的横坐标   图片开始的纵坐标
@@ -124,15 +127,15 @@ export default class BackDraw {
   // 绘制操作按钮
   drawButton() {
     let middle = screenWidth / 2
-    let src = ''
-    let image
+    // let src = ''
+    let image;
     let startX = 0,startY = 0
     let buttonLabel = ['down','left','right','up']
     for (let i in buttonLabel) {
       switch(buttonLabel[i]){
         case 'down':
            //src = 'images/cc-arrow-circle-down.png';
-          image = downImg
+           image = downImg
            startX = middle - boxWeight/2
            startY = screenHeight - boxWeight -10
            break;
