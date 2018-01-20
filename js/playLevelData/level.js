@@ -20,7 +20,7 @@ export function changePlayLevelData(key, position, value) {
   level[key][position.x][position.y] = value
 }
 // 判断人物对应的方向是什么物
-// cus 游戏关卡 | positon 人物的位置{x:,y:}   direct  移动的方向（left,right,up,down）
+// cus 游戏关卡 | positon 人物的位置{x:,y:}   direct  移动的方向(left,right,up,down)
 // 返回方向上的物
 export function directItemByPerson(cus, position, direct) {
   let gameLevel = level[cus];
@@ -48,10 +48,18 @@ export function directItemByPerson(cus, position, direct) {
   }
   // 反向位置为空白
   if(item === 0) return 0;
+  // 返回的是墙
   else if(item === 1) return 1;
-  else if(item === 2) return 2;
+  // 返回的是箱子，还得继续判断箱子是否能够移动
+  else if(item === 2) {
+    // 如果箱子也可以移动
+    if(isCouldPersonMove(cus, {x:copyX, y:copyY}, direct)) return 5;
+    // 箱子不能移动
+    else return 6
+  }
   // 返回3应该是返回了原点，走了后为空
   else if(item === 3) return 3;
+  // 返回的点
   else if(item === 4) return 4;
 }
 
@@ -59,6 +67,7 @@ export function directItemByPerson(cus, position, direct) {
 export function isCouldPersonMove(cus, position, direct) {
   let item = directItemByPerson(cus, position, direct);
   console.log('item',item)
+  /* 0空  1墙   2箱子  3人  4 点 */
   if(item === 0 || item === 4 || item === 3) return true
   else {
     return false

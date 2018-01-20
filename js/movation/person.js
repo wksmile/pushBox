@@ -1,5 +1,5 @@
 import {getDataBykey,changeData} from '../dataBus'
-import {changePlayLevelData,getPlayLevelData,isCouldPersonMove} from '../playLevelData/level'
+import {changePlayLevelData,getPlayLevelData,isCouldPersonMove,directItemByPerson} from '../playLevelData/level'
 // 箱子的宽度
 let boxWidth = getDataBykey('boxWeight')
 
@@ -11,7 +11,8 @@ image.src = 'images/people.png';
 // 箱子图片
 let imagebox = wx.createImage()
 imagebox.src = 'images/box.png'
-
+// 箱子是否应该移动true表示箱子也方向移动，false表示不移动
+let isMoveBox = false;
 // 任务相关的动画
 export default class Person {
   constructor(ctx,bg) {
@@ -27,34 +28,81 @@ export default class Person {
   handleTouch(type) {
     // 人物开始的位置
     let position = getDataBykey('personPosition')
+    // 箱子是否应该移动true表示箱子也方向移动，false表示不移动
+    isMoveBox = false
     console.log('posistion',position)
     this.personX = position.x;
     this.personY = position.y;
     this.Posendy = boxWidth * this.personY  // 人物开始的y像素
     this.Posendx = boxWidth * this.personX   // 人物开始的x像素
     console.log(this.Posendx,this.Posendy)
+    // 箱子返回的值
+    let isMove;
     if(movationFlag) {
       switch (type) {
         case 'left':
-          if(!isCouldPersonMove("1",position,"left")) return;
+          isMove = directItemByPerson("1",position,"left");
+          // -1 超出范围  1 墙    6 箱子且箱子不能移动
+          if(isMove === -1 || isMove === 1 || isMove === 6) return;
+          // 5 说明方向上的箱子也能移动，应该触发箱子移动,标志箱子可以移动
+          if(isMove === 5) {
+            isMoveBox = true;
+            // 箱子的初始位置
+            this.Boxx = this.personX -1;
+            this.Boxy = this.personY;
+            this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
+            this.Posboxy = boxWidth * this.Boxy;
+            console.log('boxPosition',this.Boxx,this.Boxy)
+            changePlayLevelData("1",{x:this.Boxx,y:this.Boxy},0)
+          }
           this.endX = this.Posendx-boxWidth
           this.timer = window.requestAnimationFrame(
             this.loopLeft.bind(this)
           ); break;
         case 'right':
-          if(!isCouldPersonMove("1",position,"right")) return;
+          isMove = directItemByPerson("1",position,"right");
+          if(isMove === -1 || isMove === 1 || isMove === 6) return;
+          if(isMove === 5) {
+            isMoveBox = true;
+            this.Boxx = this.personX + 1;
+            this.Boxy = this.personY;
+            this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
+            this.Posboxy = boxWidth * this.Boxy;
+            console.log('boxPosition',this.Boxx,this.Boxy)
+            changePlayLevelData("1",{x:this.Boxx,y:this.Boxy},0)
+          }
           this.endX = this.Posendx+boxWidth
           this.timer = window.requestAnimationFrame(
             this.loopRight.bind(this)
           ); break;
         case 'down':
-          if(!isCouldPersonMove("1",position,"down")) return;
+          isMove = directItemByPerson("1",position,"down");
+          if(isMove === -1 || isMove === 1 || isMove === 6) return;
+          if(isMove === 5) {
+            isMoveBox = true;
+            this.Boxx = this.personX;
+            this.Boxy = this.personY+1;
+            this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
+            this.Posboxy = boxWidth * this.Boxy;
+            console.log('boxPosition',this.Boxx,this.Boxy)
+            changePlayLevelData("1",{x:this.Boxx,y:this.Boxy},0)
+          }
           this.endY = this.Posendy+boxWidth
           this.timer = window.requestAnimationFrame(
             this.loopDown.bind(this)
           ); break;
         case 'up':
-          if(!isCouldPersonMove("1",position,"up")) return;
+          isMove = directItemByPerson("1",position,"up");
+          if(isMove === -1 || isMove === 1 || isMove === 6) return;
+          if(isMove === 5) {
+            isMoveBox = true;
+            this.Boxx = this.personX;
+            this.Boxy = this.personY-1;
+            this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
+            this.Posboxy = boxWidth * this.Boxy;
+            console.log('boxPosition',this.Boxx,this.Boxy)
+            changePlayLevelData("1",{x:this.Boxx,y:this.Boxy},0)
+          }
           this.endY = this.Posendy-boxWidth
           this.timer = window.requestAnimationFrame(
             this.loopUp.bind(this)
@@ -67,6 +115,10 @@ export default class Person {
   loopLeft(){
     console.log('move left----')
     if(this.Posendx > this.endX) {
+      // 箱子也移动
+      if(isMoveBox) {
+        this.Posboxx--
+      }
       this.Posendx--
       this.update()
       this.updateLeft()
@@ -89,8 +141,11 @@ export default class Person {
   loopRight(){
     console.log('move right----')
     if(this.Posendx < this.endX) {
-      this.update()
+      if(isMoveBox) {
+        this.Posboxx++
+      }
       this.Posendx++
+      this.update()
       this.updateRight()
     } else {
       cancelAnimationFrame(this.timer);
@@ -116,8 +171,11 @@ export default class Person {
   loopDown(){
     console.log('move down----')
     if(this.Posendy < this.endY) {
-      this.update()
+      if(isMoveBox) {
+        this.Posboxy++
+      }
       this.Posendy++
+      this.update()
       this.updateDown()
     } else {
       cancelAnimationFrame(this.timer);
@@ -139,8 +197,11 @@ export default class Person {
   loopUp(){
     console.log('move up----')
     if(this.Posendy > this.endY) {
-      this.update()
+      if(isMoveBox) {
+        this.Posboxy--
+      }
       this.Posendy--
+      this.update()
       this.updateUp()
     } else {
       cancelAnimationFrame(this.timer);
@@ -187,5 +248,6 @@ export default class Person {
     this.bg.drawButton()
     // 绘制人物，绘制人物的位置
     this.ctx.drawImage(image,this.Posendx,this.Posendy,boxWidth,boxWidth)   // 人物
+    if(isMoveBox) this.ctx.drawImage(imagebox,this.Posboxx,this.Posboxy,boxWidth,boxWidth)   // 箱子
   }
 }
