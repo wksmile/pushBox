@@ -12,7 +12,7 @@ export default class Main {
     this.person = new Person(ctx,this.bg);
     this.reset();
     this.listenAction()
-    this.boxWeight = this.bg.boxWeight    //  箱子的宽度
+    // this.boxWeight = this.bg.boxWeight    //  箱子的宽度
   }
 
   reset() {

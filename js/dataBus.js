@@ -5,7 +5,9 @@ const busData = {
     y: null
   },
   // 元素每一块的宽度
-  boxWeight: 0
+  boxWeight: 0,
+  // 箱子的总数
+  boxNum: 0
 }
 // 改变数据
 export function changeData(key, value) {

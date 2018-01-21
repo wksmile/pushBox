@@ -26,6 +26,8 @@ export default class Person {
 
   // type运动的类型
   handleTouch(type) {
+    // 动画还未结束
+    if(!movationFlag) return;
     // 人物开始的位置
     let position = getDataBykey('personPosition')
     // 箱子是否应该移动true表示箱子也方向移动，false表示不移动
@@ -36,80 +38,75 @@ export default class Person {
     this.Posendy = boxWidth * this.personY  // 人物开始的y像素
     this.Posendx = boxWidth * this.personX   // 人物开始的x像素
     console.log(this.Posendx,this.Posendy)
-    // 箱子返回的值
+    // 根据人物移动方向上的位置返回方向物品
     let isMove;
-    if(movationFlag) {
-      switch (type) {
-        case 'left':
-          isMove = directItemByPerson("1",position,"left");
-          // -1 超出范围  1 墙    6 箱子且箱子不能移动
-          if(isMove === -1 || isMove === 1 || isMove === 6) return;
-          // 5 说明方向上的箱子也能移动，应该触发箱子移动,标志箱子可以移动
-          if(isMove === 5) {
-            isMoveBox = true;
-            // 箱子的初始位置
-            this.Boxx = this.personX -1;
-            this.Boxy = this.personY;
-            this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
-            this.Posboxy = boxWidth * this.Boxy;
-            console.log('boxPosition',this.Boxx,this.Boxy)
-            changePlayLevelData("1",{x:this.Boxx,y:this.Boxy},0)
-          }
-          this.endX = this.Posendx-boxWidth
-          this.timer = window.requestAnimationFrame(
-            this.loopLeft.bind(this)
-          ); break;
-        case 'right':
-          isMove = directItemByPerson("1",position,"right");
-          if(isMove === -1 || isMove === 1 || isMove === 6) return;
-          if(isMove === 5) {
-            isMoveBox = true;
-            this.Boxx = this.personX + 1;
-            this.Boxy = this.personY;
-            this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
-            this.Posboxy = boxWidth * this.Boxy;
-            console.log('boxPosition',this.Boxx,this.Boxy)
-            changePlayLevelData("1",{x:this.Boxx,y:this.Boxy},0)
-          }
-          this.endX = this.Posendx+boxWidth
-          this.timer = window.requestAnimationFrame(
-            this.loopRight.bind(this)
-          ); break;
-        case 'down':
-          isMove = directItemByPerson("1",position,"down");
-          if(isMove === -1 || isMove === 1 || isMove === 6) return;
-          if(isMove === 5) {
-            isMoveBox = true;
-            this.Boxx = this.personX;
-            this.Boxy = this.personY+1;
-            this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
-            this.Posboxy = boxWidth * this.Boxy;
-            console.log('boxPosition',this.Boxx,this.Boxy)
-            changePlayLevelData("1",{x:this.Boxx,y:this.Boxy},0)
-          }
-          this.endY = this.Posendy+boxWidth
-          this.timer = window.requestAnimationFrame(
-            this.loopDown.bind(this)
-          ); break;
-        case 'up':
-          isMove = directItemByPerson("1",position,"up");
-          if(isMove === -1 || isMove === 1 || isMove === 6) return;
-          if(isMove === 5) {
-            isMoveBox = true;
-            this.Boxx = this.personX;
-            this.Boxy = this.personY-1;
-            this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
-            this.Posboxy = boxWidth * this.Boxy;
-            console.log('boxPosition',this.Boxx,this.Boxy)
-            changePlayLevelData("1",{x:this.Boxx,y:this.Boxy},0)
-          }
-          this.endY = this.Posendy-boxWidth
-          this.timer = window.requestAnimationFrame(
-            this.loopUp.bind(this)
-          ); break;
-      }
-      movationFlag = false
+    switch (type) {
+      case 'left':
+        isMove = directItemByPerson("1",position,"left");
+        // -1 超出范围  1 墙    6 箱子且箱子不能移动
+        if(isMove === -1 || isMove === 1 || isMove === 6) return;
+        console.log('ismove',isMove)
+        // 5 说明方向上的箱子也能移动，应该触发箱子移动,标志箱子可以移动
+        if(isMove === 5) {
+          isMoveBox = true;
+          // 箱子的初始位置
+          this.Boxx = this.personX -1;
+          this.Boxy = this.personY;
+          this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
+          this.Posboxy = boxWidth * this.Boxy;
+          console.log('boxPosition',this.Boxx,this.Boxy)
+        }
+        this.endX = this.Posendx-boxWidth
+        this.timer = window.requestAnimationFrame(
+          this.loopLeft.bind(this)
+        ); break;
+      case 'right':
+        isMove = directItemByPerson("1",position,"right");
+        if(isMove === -1 || isMove === 1 || isMove === 6) return;
+        if(isMove === 5) {
+          isMoveBox = true;
+          this.Boxx = this.personX + 1;
+          this.Boxy = this.personY;
+          this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
+          this.Posboxy = boxWidth * this.Boxy;
+          console.log('boxPosition',this.Boxx,this.Boxy)
+        }
+        this.endX = this.Posendx+boxWidth
+        this.timer = window.requestAnimationFrame(
+          this.loopRight.bind(this)
+        ); break;
+      case 'down':
+        isMove = directItemByPerson("1",position,"down");
+        if(isMove === -1 || isMove === 1 || isMove === 6) return;
+        if(isMove === 5) {
+          isMoveBox = true;
+          this.Boxx = this.personX;
+          this.Boxy = this.personY+1;
+          this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
+          this.Posboxy = boxWidth * this.Boxy;
+          console.log('boxPosition',this.Boxx,this.Boxy)
+        }
+        this.endY = this.Posendy+boxWidth
+        this.timer = window.requestAnimationFrame(
+          this.loopDown.bind(this)
+        ); break;
+      case 'up':
+        isMove = directItemByPerson("1",position,"up");
+        if(isMove === -1 || isMove === 1 || isMove === 6) return;
+        if(isMove === 5) {
+          isMoveBox = true;
+          this.Boxx = this.personX;
+          this.Boxy = this.personY-1;
+          this.Posboxx = boxWidth * this.Boxx;  // 箱子开始的位置
+          this.Posboxy = boxWidth * this.Boxy;
+          console.log('boxPosition',this.Boxx,this.Boxy)
+        }
+        this.endY = this.Posendy-boxWidth
+        this.timer = window.requestAnimationFrame(
+          this.loopUp.bind(this)
+        ); break;
     }
+      movationFlag = false
   }
 
   loopLeft(){
@@ -128,6 +125,11 @@ export default class Person {
       // changePlayLevelData("1",{x:this.personX,y:this.personY},0)
       // changePlayLevelData("1",{x: --this.personX,y:this.personY},3)
       changeData('personPosition',{x:--this.personX,y:this.personY})
+      if(isMoveBox) {
+        changePlayLevelData("1",{y:this.Boxx,x:this.Boxy},0)
+        changePlayLevelData("1",{y:--this.Boxx,x:this.Boxy},2,{y:this.Boxx,x:this.Boxy})
+      }
+      // 改变levelData中游戏地图，保存箱子移动后的距离
       console.log('youyouqiekela',this.personX,this.personY)
     }
   }
@@ -154,6 +156,10 @@ export default class Person {
       //changePlayLevelData("1",{x:this.personX,y:this.personY},0)
       //changePlayLevelData("1",{x: ++this.personX,y:this.personY},3)
       changeData('personPosition',{x:++this.personX,y:this.personY})
+      if(isMoveBox) {
+        changePlayLevelData("1",{y:this.Boxx,x:this.Boxy},0)
+        changePlayLevelData("1",{y:++this.Boxx,x:this.Boxy},2,{y:this.Boxx,x:this.Boxy})
+      }
       console.log('youyouqiekela',this.personX,this.personY)
       // 再绘制一次，更新人物的位置，并绘制了人物终点的位置
       // this.ctx.clearRect(0,0,canvas.width,canvas.height)
@@ -183,6 +189,10 @@ export default class Person {
       // changePlayLevelData("1",{x:this.personX,y:this.personY},0)
       // changePlayLevelData("1",{x: this.personX,y:++this.personY},3)
       changeData('personPosition',{x:this.personX,y:++this.personY})
+      if(isMoveBox) {
+        changePlayLevelData("1",{y:this.Boxx,x:this.Boxy},0)
+        changePlayLevelData("1",{y:this.Boxx,x:++this.Boxy},2,{y:this.Boxx,x:this.Boxy})
+      }
       console.log('youyouqiekela',this.personX,this.personY)
       console.log(getPlayLevelData('1')[2][3])
     }
@@ -212,6 +222,10 @@ export default class Person {
       // changePlayLevelData("1",{x: this.personX,y:--this.personY},3)
       // 改变databus中person的信息
       changeData('personPosition',{x:this.personX,y:--this.personY})
+      if(isMoveBox) {
+        changePlayLevelData("1",{y:this.Boxx,x:this.Boxy},0)
+        changePlayLevelData("1",{y:this.Boxx,x:--this.Boxy},2,{y:this.Boxx,x:this.Boxy})
+      }
       console.log('youyouqiekela',this.personX,this.personY)
     }
   }
@@ -243,6 +257,7 @@ export default class Person {
   // 擦除，重汇按钮
   update() {
     this.ctx.clearRect(0,0,canvas.width,canvas.height)
+    this.bg.drawBackground('#eee')
     // false不会绘制人物的位置，人物由上面自动控制
     this.bg.drawGameLevel("1",false)
     this.bg.drawButton()
